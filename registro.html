@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRide - Registro de Bicicleta</title>
+
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <div class="form-container">
+
+        <div class="page-header">
+
+            <h2>🚲 Registrar Bicicleta</h2>
+
+            <a href="dashboard.html" class="back-btn">
+                ← Volver
+            </a>
+
+        </div>
+
+        <div class="form-card">
+
+            <form>
+
+                <label>Marca</label>
+                <input
+                    type="text"
+                    placeholder="Ej: GW, Trek, Specialized"
+                >
+
+                <label>Modelo</label>
+                <input
+                    type="text"
+                    placeholder="Modelo de la bicicleta"
+                >
+
+                <label>Color</label>
+                <input
+                    type="text"
+                    placeholder="Ej: Negro, Azul, Rojo"
+                >
+
+                <label>Número de Serie</label>
+                <input
+                    type="text"
+                    placeholder="Ingrese el número de serie"
+                >
+
+                <label>Tipo de Bicicleta</label>
+
+                <select>
+                    <option>Seleccione una opción</option>
+                    <option>Montaña</option>
+                    <option>Ruta</option>
+                    <option>Híbrida</option>
+                    <option>Eléctrica</option>
+                </select>
+
+                <label>Fotografía</label>
+
+                <input type="file">
+
+                <button type="button">
+                    Guardar Registro
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
