@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QRide - Mi Perfil</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body{font-family:system-ui,sans-serif;background:#f8fafc;margin:0;}
+    .card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);padding:16px;margin-bottom:12px;}
+    .input-f{background:#F1F5F9;border:none;border-radius:8px;height:44px;width:100%;padding:0 12px;font-size:14px;color:#044C71;outline:none;box-sizing:border-box;}
+    label{font-size:13px;font-weight:600;color:#044C71;display:block;margin-bottom:4px;}
+    .nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:#6b7a85;text-decoration:none;gap:2px;}
+    .nav-item.active{color:#FF7A00;}
+  </style>
+</head>
+<body>
+  <nav style="background:#fff;border-bottom:3px solid #FF7A00;position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:56px;">
+    <img src="Qride.png" alt="QRide" style="height:38px;object-fit:contain;" />
+    <button onclick="logout()" style="background:none;border:none;cursor:pointer;color:#044C71;font-size:13px;font-weight:600;">Salir</button>
+  </nav>
+
+  <main style="padding:16px;padding-bottom:80px;max-width:600px;margin:0 auto;">
+    <h1 style="font-size:22px;font-weight:700;color:#044C71;margin-bottom:4px;">Mi Perfil</h1>
+    <p style="font-size:13px;color:#6b7a85;margin-bottom:16px;">Administra tu información personal</p>
+
+    <div class="card" style="display:flex;align-items:center;gap:16px;">
+      <div id="avatar" style="width:72px;height:72px;border-radius:50%;background:#FF7A00;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;flex-shrink:0;">?</div>
+      <div>
+        <p id="full-name" style="font-size:16px;font-weight:600;">—</p>
+        <p id="email-display" style="font-size:13px;color:#6b7a85;"></p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:15px;font-weight:600;color:#044C71;margin-bottom:12px;">Información Personal</h2>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div><label>Nombre</label><input class="input-f" id="nombre" placeholder="Juan" /></div>
+        <div><label>Apellido</label><input class="input-f" id="apellido" placeholder="Pérez" /></div>
+        <div><label>Identificación</label><input class="input-f" id="identificacion" placeholder="1234567890" /></div>
+        <div><label>Teléfono</label><input class="input-f" id="telefono" placeholder="+57 300 123 4567" /></div>
+        <div><label>Programa Académico</label><input class="input-f" id="programa" placeholder="Ingeniería de Sistemas" /></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:15px;font-weight:600;color:#044C71;margin-bottom:4px;">Comprobante de Estudiante</h2>
+      <p style="font-size:12px;color:#6b7a85;margin-bottom:12px;">Sube tu carné o certificado</p>
+      <label for="comprobante" style="display:flex;flex-direction:column;align-items:center;padding:24px;border:2px dashed #d1d5db;border-radius:10px;cursor:pointer;text-align:center;">
+        <span style="font-size:32px;" id="upload-icon">📤</span>
+        <p id="upload-text" style="font-size:13px;font-weight:600;margin-top:8px;">Subir Comprobante</p>
+        <p style="font-size:11px;color:#6b7a85;">PNG, JPG o PDF</p>
+      </label>
+      <input type="file" id="comprobante" accept="image/*,.pdf" style="display:none;" onchange="handleFile(event)" />
+    </div>
+
+    <button onclick="saveProfile()" style="background:#FF7A00;color:#fff;border:none;border-radius:10px;height:48px;width:100%;font-size:15px;font-weight:700;cursor:pointer;">💾 Guardar Cambios</button>
+  </main>
+
+  <nav style="position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;display:grid;grid-template-columns:repeat(4,1fr);height:64px;z-index:50;">
+    <a href="dashboard.html" class="nav-item">🏠<span>Inicio</span></a>
+    <a href="perfil.html" class="nav-item active">👤<span>Perfil</span></a>
+    <a href="bicicletas.html" class="nav-item">🚲<span>Bicicletas</span></a>
+    <a href="scanner.html" class="nav-item">📷<span>Scanner</span></a>
+  </nav>
+
+  <script>
+    if (!localStorage.getItem('isLoggedIn')) window.location = 'index.html';
+    function logout() { localStorage.removeItem('isLoggedIn'); window.location = 'index.html'; }
+
+    const saved = JSON.parse(localStorage.getItem('userData') || '{}');
+    document.getElementById('nombre').value = saved.nombre || '';
+    document.getElementById('apellido').value = saved.apellido || '';
+    document.getElementById('identificacion').value = saved.identificacion || '';
+    document.getElementById('telefono').value = saved.telefono || '';
+    document.getElementById('programa').value = saved.programa || '';
+    document.getElementById('email-display').textContent = localStorage.getItem('userEmail') || '';
+    updateDisplay();
+
+    ['nombre','apellido'].forEach(id => document.getElementById(id).addEventListener('input', updateDisplay));
+
+    function updateDisplay() {
+      const n = document.getElementById('nombre').value;
+      const a = document.getElementById('apellido').value;
+      document.getElementById('full-name').textContent = (n + ' ' + a).trim() || '—';
+      document.getElementById('avatar').textContent = ((n[0]||'') + (a[0]||'')).toUpperCase() || '?';
+    }
+
+    function handleFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      document.getElementById('upload-icon').textContent = '✅';
+      document.getElementById('upload-text').textContent = 'Comprobante cargado';
+    }
+
+    function saveProfile() {
+      const data = {
+        nombre: document.getElementById('nombre').value,
+        apellido: document.getElementById('apellido').value,
+        identificacion: document.getElementById('identificacion').value,
+        telefono: document.getElementById('telefono').value,
+        programa: document.getElementById('programa').value,
+      };
+      localStorage.setItem('userData', JSON.stringify(data));
+      alert('✅ Perfil guardado correctamente');
+    }
+  </script>
+</body>
+</html>

@@ -1,70 +1,63 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QRide - Dashboard</title>
-
-    <link rel="stylesheet" href="css/styles.css">
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QRide - Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body{font-family:system-ui,sans-serif;background:#f8fafc;margin:0;}
+    .card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);padding:16px;}
+    .nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:#6b7a85;text-decoration:none;gap:2px;}
+    .nav-item.active{color:#FF7A00;}
+  </style>
 </head>
-<body>
+<body class="min-h-screen">
+  <nav style="background:#fff;border-bottom:3px solid #FF7A00;position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:56px;">
+    <img src="image-1.png" alt="QRide" style="height:38px;object-fit:contain;" />
+    <button onclick="logout()" style="background:none;border:none;cursor:pointer;color:#044C71;font-size:13px;font-weight:600;">Salir</button>
+  </nav>
 
-    <div class="dashboard-container">
+  <main style="padding:16px;padding-bottom:80px;max-width:600px;margin:0 auto;">
+    <h1 style="font-size:22px;font-weight:700;color:#044C71;margin-bottom:4px;">Panel de Control</h1>
+    <p style="font-size:13px;color:#6b7a85;margin-bottom:16px;">Bienvenido al sistema de parqueadero</p>
 
-        <header class="topbar">
-
-            <div>
-                <h2>Hola, Nelson </h2>
-                <p>Bienvenido a QRide</p>
-            </div>
-
-            <img src="img/Qride.png" alt="QRide">
-
-        </header>
-
-        <section class="status-card">
-
-            <h3>Estado de Bicicleta</h3>
-
-            <div class="status-ok">
-                ✔ Bicicleta Registrada
-            </div>
-
-            <p>
-                Tu bicicleta está autorizada para ingresar al campus.
-            </p>
-
-        </section>
-
-        <section class="menu-grid">
-
-            <a href="registro.html" class="card">
-                <span></span>
-                <h3>Registrar Bicicleta</h3>
-                <p>Gestiona los datos de tu bicicleta</p>
-            </a>
-
-            <a href="scanner.html" class="card">
-                <span></span>
-                <h3>Escanear QR</h3>
-                <p>Validación de acceso</p>
-            </a>
-
-            <a href="perfil.html" class="card">
-                <span></span>
-                <h3>Mi Perfil</h3>
-                <p>Consulta tu información</p>
-            </a>
-
-            <a href="#" class="card">
-                <span>⚠️</span>
-                <h3>Reportar Incidente</h3>
-                <p>Informar novedades o robos</p>
-            </a>
-
-        </section>
-
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div class="card"><p style="font-size:11px;color:#6b7a85;margin-bottom:4px;">Bicicletas Registradas</p><p style="font-size:22px;font-weight:700;color:#044C71;">3</p></div>
+      <div class="card"><p style="font-size:11px;color:#6b7a85;margin-bottom:4px;">En el Parqueadero</p><p style="font-size:22px;font-weight:700;color:#0376B2;">1</p></div>
+      <div class="card"><p style="font-size:11px;color:#6b7a85;margin-bottom:4px;">Último Acceso</p><p style="font-size:16px;font-weight:700;color:#044C71;">Hace 2 horas</p></div>
+      <div class="card"><p style="font-size:11px;color:#6b7a85;margin-bottom:4px;">Estado</p><p style="font-size:22px;font-weight:700;color:#16a34a;">Activo</p></div>
     </div>
 
+    <div class="card">
+      <h2 style="font-size:16px;font-weight:600;color:#044C71;margin-bottom:12px;">Actividad Reciente</h2>
+      <div id="activity-list"></div>
+    </div>
+  </main>
+
+  <nav style="position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;display:grid;grid-template-columns:repeat(4,1fr);height:64px;z-index:50;">
+    <a href="dashboard.html" class="nav-item active">🏠<span>Inicio</span></a>
+    <a href="perfil.html" class="nav-item">👤<span>Perfil</span></a>
+    <a href="bicicletas.html" class="nav-item">🚲<span>Bicicletas</span></a>
+    <a href="scanner.html" class="nav-item">📷<span>Scanner</span></a>
+  </nav>
+
+  <script>
+    if (!localStorage.getItem('isLoggedIn')) window.location = 'index.html';
+    function logout() { localStorage.removeItem('isLoggedIn'); window.location = 'index.html'; }
+    const activity = [
+      { action:'Entrada', bike:'Bicicleta de Montaña', time:'Hace 2 horas', date:'25/04/2026', isEntrada:true },
+      { action:'Salida', bike:'Bicicleta de Ruta', time:'Hace 5 horas', date:'25/04/2026', isEntrada:false },
+      { action:'Entrada', bike:'Bicicleta Urbana', time:'Hace 1 día', date:'24/04/2026', isEntrada:true },
+      { action:'Salida', bike:'Bicicleta Urbana', time:'Hace 1 día', date:'24/04/2026', isEntrada:false },
+    ];
+    document.getElementById('activity-list').innerHTML = activity.map(a => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:#f8fafc;border-radius:10px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:50%;background:${a.isEntrada?'rgba(3,118,178,0.12)':'rgba(255,122,0,0.12)'};display:flex;align-items:center;justify-content:center;font-size:18px;">${a.isEntrada?'✅':'🕐'}</div>
+          <div><p style="font-size:13px;font-weight:600;">${a.action}</p><p style="font-size:11px;color:#6b7a85;">${a.bike}</p></div>
+        </div>
+        <div style="text-align:right;"><p style="font-size:11px;font-weight:600;">${a.time}</p><p style="font-size:11px;color:#6b7a85;">${a.date}</p></div>
+      </div>`).join('');
+  </script>
 </body>
 </html>

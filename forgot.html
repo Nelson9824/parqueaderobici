@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QRide - Recuperar Contraseña</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; background:#fff; }
+    .input-field { background:#F1F5F9; border:none; border-radius:9999px; height:52px; width:100%; padding:0 1rem 0 3rem; font-size:14px; color:#044C71; outline:none; }
+    .btn-orange { background:#FF7A00; color:#fff; border:none; border-radius:9999px; height:52px; width:100%; font-size:15px; font-weight:700; cursor:pointer; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <div class="flex flex-col px-8 pt-10 pb-4 flex-1">
+    <button onclick="history.back()" style="display:flex;align-items:center;gap:8px;color:#044C71;background:none;border:none;cursor:pointer;margin-bottom:32px;font-weight:600;">
+      ← Volver
+    </button>
+    <img src="image-1.png" alt="QRide" style="height:70px;object-fit:contain;align-self:center;" class="mb-6" />
+
+    <div id="form-section">
+      <h2 style="color:#044C71;font-size:20px;font-weight:700;margin-bottom:8px;">¿Olvidaste tu contraseña?</h2>
+      <p style="color:#6b7a85;font-size:13px;margin-bottom:28px;line-height:1.6;">Ingresa tu correo institucional y te enviaremos las instrucciones para restablecerla.</p>
+      <div class="relative w-full mb-4">
+        <svg class="absolute" style="left:14px;top:50%;transform:translateY(-50%);color:#044C71;" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <input class="input-field" type="email" id="forgot-email" placeholder="Correo institucional" />
+      </div>
+      <button class="btn-orange" onclick="sendReset()">Enviar instrucciones</button>
+    </div>
+
+    <div id="success-section" style="display:none;text-align:center;margin-top:16px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#FF7A00" stroke-width="1.5" style="margin:0 auto 16px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+      <h2 style="color:#044C71;font-size:18px;font-weight:700;">¡Correo enviado!</h2>
+      <p id="sent-msg" style="color:#6b7a85;font-size:14px;line-height:1.6;margin:12px 0 24px;"></p>
+      <button class="btn-orange" onclick="window.location='index.html'">Volver al inicio de sesión</button>
+    </div>
+  </div>
+  <div style="margin-bottom:-2px;">
+    <svg viewBox="0 0 390 230" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;" preserveAspectRatio="xMidYMax meet">
+      <path d="M 390 230 L 390 140 L 265 20 Q 248 4 228 16 L 105 140 L 105 230 Z" fill="#044C71"/>
+      <path d="M -10 230 L -10 150 L 110 55 Q 128 38 148 55 L 285 185 Q 310 210 340 200 L 390 185 L 390 230 Z" fill="#0376B2"/>
+    </svg>
+  </div>
+  <div style="background:#FF7A00;height:22px;width:100%;"></div>
+  <script>
+    function sendReset() {
+      const email = document.getElementById('forgot-email').value;
+      if (!email) { alert('Ingresa tu correo'); return; }
+      document.getElementById('form-section').style.display = 'none';
+      document.getElementById('success-section').style.display = 'block';
+      document.getElementById('sent-msg').innerHTML = `Revisa tu bandeja en<br><strong style="color:#0376B2;">${email}</strong><br>y sigue las instrucciones.`;
+    }
+  </script>
+</body>
+</html>

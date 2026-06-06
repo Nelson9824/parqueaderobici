@@ -1,57 +1,107 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QRide - Escáner QR</title>
-
-    <link rel="stylesheet" href="css/styles.css">
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QRide - Scanner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body{font-family:system-ui,sans-serif;background:#f8fafc;margin:0;}
+    .card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);padding:16px;margin-bottom:12px;}
+    .nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:#6b7a85;text-decoration:none;gap:2px;}
+    .nav-item.active{color:#FF7A00;}
+    .qr-box{aspect-ratio:1;width:100%;border-radius:12px;border:4px solid rgba(4,76,113,0.3);position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(4,76,113,0.05),rgba(3,118,178,0.05));display:flex;align-items:center;justify-content:center;}
+    .corner{position:absolute;width:60px;height:60px;border-color:#044C71;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+    @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    .scanning .qr-box{border-color:#FF7A00;animation:pulse 1s infinite;}
+    .scanning .qr-icon{animation:bounce 0.6s infinite;}
+  </style>
 </head>
 <body>
+  <nav style="background:#fff;border-bottom:3px solid #FF7A00;position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:56px;">
+    <img src="image-1.png" alt="QRide" style="height:38px;object-fit:contain;" />
+    <button onclick="logout()" style="background:none;border:none;cursor:pointer;color:#044C71;font-size:13px;font-weight:600;">Salir</button>
+  </nav>
 
-    <div class="scanner-container">
+  <main style="padding:16px;padding-bottom:80px;max-width:600px;margin:0 auto;">
+    <h1 style="font-size:22px;font-weight:700;color:#044C71;margin-bottom:4px;">Scanner QR</h1>
+    <p style="font-size:13px;color:#6b7a85;margin-bottom:16px;">Registra entrada o salida</p>
 
-        <div class="page-header">
-
-            <h2>📷 Escáner QR</h2>
-
-            <a href="dashboard.html" class="back-btn">
-                ← Volver
-            </a>
-
+    <div class="card">
+      <h2 style="font-size:15px;font-weight:600;color:#044C71;margin-bottom:12px;">Escanear Código</h2>
+      <div style="margin-bottom:12px;">
+        <select id="bike-select" style="background:#F1F5F9;border:none;border-radius:8px;height:44px;width:100%;padding:0 12px;font-size:14px;color:#044C71;outline:none;">
+          <option value="">Elige una bicicleta</option>
+        </select>
+      </div>
+      <div class="qr-box" id="qr-box">
+        <div style="text-align:center;" id="qr-content">
+          <div style="font-size:64px;" class="qr-icon">📷</div>
+          <p style="font-size:13px;color:#6b7a85;margin-top:8px;">Posiciona el código QR aquí</p>
         </div>
-
-        <div class="scanner-card">
-
-            <h3>Escanee el código QR</h3>
-
-            <p>
-                Ubique el código QR dentro del área de escaneo.
-            </p>
-
-            <div class="scanner-box">
-
-                <div class="scanner-frame"></div>
-
-            </div>
-
-            <div class="scan-result success">
-
-                <h4>✓ Bicicleta Autorizada</h4>
-
-                <p>
-                    Registro válido encontrado.
-                </p>
-
-            </div>
-
-            <button onclick="alert('Simulación de escaneo completada')">
-                Simular Escaneo
-            </button>
-
-        </div>
-
+        <div class="corner" style="top:24px;left:24px;border-top:4px solid;border-left:4px solid;border-radius:4px 0 0 0;"></div>
+        <div class="corner" style="top:24px;right:24px;border-top:4px solid;border-right:4px solid;border-radius:0 4px 0 0;"></div>
+        <div class="corner" style="bottom:24px;left:24px;border-bottom:4px solid;border-left:4px solid;border-radius:0 0 0 4px;"></div>
+        <div class="corner" style="bottom:24px;right:24px;border-bottom:4px solid;border-right:4px solid;border-radius:0 0 4px 0;"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+        <button onclick="handleScan('entrada')" style="background:#0376B2;color:#fff;border:none;border-radius:8px;height:48px;font-size:15px;font-weight:700;cursor:pointer;">→ Entrada</button>
+        <button onclick="handleScan('salida')" style="background:#FF7A00;color:#fff;border:none;border-radius:8px;height:48px;font-size:15px;font-weight:700;cursor:pointer;">← Salida</button>
+      </div>
     </div>
 
+    <div class="card">
+      <h2 style="font-size:15px;font-weight:600;color:#044C71;margin-bottom:12px;">Historial de Acceso</h2>
+      <div id="records-list" style="max-height:300px;overflow-y:auto;"></div>
+    </div>
+  </main>
+
+  <nav style="position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;display:grid;grid-template-columns:repeat(4,1fr);height:64px;z-index:50;">
+    <a href="dashboard.html" class="nav-item">🏠<span>Inicio</span></a>
+    <a href="perfil.html" class="nav-item">👤<span>Perfil</span></a>
+    <a href="bicicletas.html" class="nav-item">🚲<span>Bicicletas</span></a>
+    <a href="scanner.html" class="nav-item active">📷<span>Scanner</span></a>
+  </nav>
+
+  <script>
+    if (!localStorage.getItem('isLoggedIn')) window.location = 'index.html';
+    function logout() { localStorage.removeItem('isLoggedIn'); window.location = 'index.html'; }
+
+    const bikes = JSON.parse(localStorage.getItem('bikes')||'[]');
+    const sel = document.getElementById('bike-select');
+    bikes.forEach(b => { const o=document.createElement('option'); o.value=b.id; o.textContent=`${b.marca} ${b.modelo}`; sel.appendChild(o); });
+
+    let records = JSON.parse(localStorage.getItem('accessRecords')||'[]');
+    renderRecords();
+
+    function handleScan(action) {
+      const bikeId = sel.value;
+      if (!bikeId) { alert('Por favor selecciona una bicicleta'); return; }
+      const box = document.getElementById('qr-box');
+      box.classList.add('scanning');
+      document.getElementById('qr-content').innerHTML = '<div style="font-size:64px;" class="qr-icon">📷</div><p style="font-size:14px;font-weight:600;margin-top:8px;">Escaneando...</p>';
+      setTimeout(() => {
+        box.classList.remove('scanning');
+        const bike = bikes.find(b=>b.id===bikeId);
+        const record = { id:Date.now().toString(), bikeId, bikeName:`${bike.marca} ${bike.modelo}`, type:action, timestamp:new Date().toISOString() };
+        records = [record, ...records];
+        localStorage.setItem('accessRecords', JSON.stringify(records));
+        const ok = action==='entrada';
+        document.getElementById('qr-content').innerHTML = `<div style="font-size:64px;">${ok?'✅':'⬅️'}</div><p style="font-size:14px;font-weight:600;color:${ok?'#16a34a':'#FF7A00'};">${ok?'Entrada':'Salida'} Registrada</p>`;
+        renderRecords();
+        setTimeout(()=>{ document.getElementById('qr-content').innerHTML = '<div style="font-size:64px;">📷</div><p style="font-size:13px;color:#6b7a85;margin-top:8px;">Posiciona el código QR aquí</p>'; }, 3000);
+      }, 2000);
+    }
+
+    function renderRecords() {
+      const el = document.getElementById('records-list');
+      if (!records.length) { el.innerHTML='<p style="text-align:center;color:#6b7a85;font-size:13px;padding:20px;">No hay registros</p>'; return; }
+      el.innerHTML = records.map(r => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;margin-bottom:6px;border-left:4px solid ${r.type==='entrada'?'#0376B2':'#FF7A00'};background:${r.type==='entrada'?'rgba(3,118,178,0.06)':'rgba(255,122,0,0.06)'};">
+          <div><p style="font-size:13px;font-weight:600;text-transform:capitalize;">${r.type}</p><p style="font-size:11px;color:#6b7a85;">${r.bikeName}</p></div>
+          <p style="font-size:11px;color:#6b7a85;">${new Date(r.timestamp).toLocaleString('es-CO',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</p>
+        </div>`).join('');
+    }
+  </script>
 </body>
 </html>

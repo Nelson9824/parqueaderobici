@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QRide - Bicicletas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body{font-family:system-ui,sans-serif;background:#f8fafc;margin:0;}
+    .card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);padding:16px;margin-bottom:12px;}
+    .input-f{background:#F1F5F9;border:none;border-radius:8px;height:44px;width:100%;padding:0 12px;font-size:14px;color:#044C71;outline:none;box-sizing:border-box;}
+    label{font-size:13px;font-weight:600;color:#044C71;display:block;margin-bottom:4px;}
+    .nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:#6b7a85;text-decoration:none;gap:2px;}
+    .nav-item.active{color:#FF7A00;}
+    .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:center;justify-content:center;}
+    .modal-bg.open{display:flex;}
+    .modal{background:#fff;border-radius:16px;padding:24px;width:90%;max-width:420px;max-height:90vh;overflow-y:auto;}
+  </style>
+</head>
+<body>
+  <nav style="background:#fff;border-bottom:3px solid #FF7A00;position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:56px;">
+    <img src="image-1.png" alt="QRide" style="height:38px;object-fit:contain;" />
+    <button onclick="logout()" style="background:none;border:none;cursor:pointer;color:#044C71;font-size:13px;font-weight:600;">Salir</button>
+  </nav>
+
+  <main style="padding:16px;padding-bottom:80px;max-width:600px;margin:0 auto;">
+    <h1 style="font-size:22px;font-weight:700;color:#044C71;margin-bottom:4px;">Mis Bicicletas</h1>
+    <p style="font-size:13px;color:#6b7a85;margin-bottom:12px;">Gestiona tu registro</p>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button onclick="openModal()" style="background:#FF7A00;color:#fff;border:none;border-radius:8px;height:40px;padding:0 16px;font-size:14px;font-weight:600;cursor:pointer;">+ Agregar</button>
+      <button onclick="openIncident()" style="background:#fff;color:#b91c1c;border:1.5px solid #fca5a5;border-radius:8px;height:40px;padding:0 16px;font-size:14px;font-weight:600;cursor:pointer;">⚠ Reportar Incidente</button>
+    </div>
+    <div id="bikes-list"></div>
+  </main>
+
+  <!-- Modal agregar/editar -->
+  <div class="modal-bg" id="bike-modal">
+    <div class="modal">
+      <h2 style="font-size:16px;font-weight:700;color:#044C71;margin-bottom:16px;" id="modal-title">Registrar Bicicleta</h2>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div><label>Marca</label><input class="input-f" id="b-marca" placeholder="Trek, Giant..." /></div>
+        <div><label>Modelo</label><input class="input-f" id="b-modelo" placeholder="X-Caliber 8" /></div>
+        <div><label>Color</label><input class="input-f" id="b-color" placeholder="Azul, Rojo..." /></div>
+        <div><label>Tipo</label>
+          <select class="input-f" id="b-tipo">
+            <option value="montana">Montaña</option><option value="ruta">Ruta</option>
+            <option value="urbana">Urbana</option><option value="electrica">Eléctrica</option><option value="bmx">BMX</option>
+          </select>
+        </div>
+        <div><label>Número de Serie</label><input class="input-f" id="b-serial" placeholder="ABC123456789" /></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px;">
+        <button onclick="closeModal()" style="flex:1;height:44px;border:1.5px solid #e5e7eb;border-radius:8px;background:#fff;cursor:pointer;font-size:14px;">Cancelar</button>
+        <button onclick="saveBike()" style="flex:1;height:44px;background:#FF7A00;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal incidente -->
+  <div class="modal-bg" id="incident-modal">
+    <div class="modal">
+      <h2 style="font-size:16px;font-weight:700;color:#044C71;margin-bottom:16px;">Reportar Incidente</h2>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div><label>Tipo</label>
+          <select class="input-f" id="i-type">
+            <option value="robo">Robo o Intento de Robo</option><option value="dano">Daño a mi Bicicleta</option>
+            <option value="perdida">Bicicleta Perdida</option><option value="otro">Otro Problema</option>
+          </select>
+        </div>
+        <div><label>Descripción</label><textarea id="i-desc" style="background:#F1F5F9;border:none;border-radius:8px;width:100%;padding:12px;font-size:14px;color:#044C71;outline:none;min-height:100px;box-sizing:border-box;resize:none;" placeholder="Describe lo que sucedió..."></textarea></div>
+        <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:12px;font-size:12px;color:#92400e;">⚠ Si es emergencia, contacta directamente a la guardia.</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px;">
+        <button onclick="closeIncident()" style="flex:1;height:44px;border:1.5px solid #e5e7eb;border-radius:8px;background:#fff;cursor:pointer;">Cancelar</button>
+        <button onclick="submitIncident()" style="flex:1;height:44px;background:#dc2626;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;">Enviar Reporte</button>
+      </div>
+    </div>
+  </div>
+
+  <nav style="position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;display:grid;grid-template-columns:repeat(4,1fr);height:64px;z-index:50;">
+    <a href="dashboard.html" class="nav-item">🏠<span>Inicio</span></a>
+    <a href="perfil.html" class="nav-item">👤<span>Perfil</span></a>
+    <a href="bicicletas.html" class="nav-item active">🚲<span>Bicicletas</span></a>
+    <a href="scanner.html" class="nav-item">📷<span>Scanner</span></a>
+  </nav>
+
+  <script>
+    if (!localStorage.getItem('isLoggedIn')) window.location = 'index.html';
+    function logout() { localStorage.removeItem('isLoggedIn'); window.location = 'index.html'; }
+
+    let bikes = JSON.parse(localStorage.getItem('bikes') || '[]');
+    let editingId = null;
+    const tipos = {montana:'Montaña',ruta:'Ruta',urbana:'Urbana',electrica:'Eléctrica',bmx:'BMX'};
+
+    function render() {
+      const el = document.getElementById('bikes-list');
+      if (!bikes.length) {
+        el.innerHTML = `<div style="background:#fff;border-radius:12px;padding:40px 16px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.08);">🚲<p style="font-size:15px;font-weight:600;margin-top:12px;">No tienes bicicletas</p><p style="font-size:13px;color:#6b7a85;">Agrega tu primera bicicleta</p></div>`;
+        return;
+      }
+      el.innerHTML = bikes.map(b => `
+        <div style="background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);margin-bottom:10px;overflow:hidden;">
+          <div style="padding:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+              <div><p style="font-size:15px;font-weight:700;color:#044C71;">${b.marca}</p><p style="font-size:13px;color:#6b7a85;">${b.modelo}</p></div>
+              <div style="display:flex;gap:4px;">
+                <button onclick="editBike('${b.id}')" style="background:none;border:none;cursor:pointer;padding:4px;font-size:16px;">✏️</button>
+                <button onclick="deleteBike('${b.id}')" style="background:none;border:none;cursor:pointer;padding:4px;font-size:16px;">🗑️</button>
+              </div>
+            </div>
+            <div style="font-size:12px;color:#6b7a85;display:flex;flex-direction:column;gap:2px;">
+              <div style="display:flex;justify-content:space-between;"><span>Tipo:</span><span style="font-weight:600;color:#044C71;">${tipos[b.tipo]||b.tipo}</span></div>
+              <div style="display:flex;justify-content:space-between;"><span>Color:</span><span style="font-weight:600;color:#044C71;">${b.color}</span></div>
+              <div style="display:flex;justify-content:space-between;"><span>Serie:</span><span style="font-weight:600;color:#044C71;font-family:monospace;">${b.serial}</span></div>
+            </div>
+          </div>
+        </div>`).join('');
+    }
+
+    function openModal(id=null) {
+      editingId = id;
+      if (id) {
+        const b = bikes.find(x=>x.id===id);
+        document.getElementById('modal-title').textContent = 'Editar Bicicleta';
+        document.getElementById('b-marca').value = b.marca;
+        document.getElementById('b-modelo').value = b.modelo;
+        document.getElementById('b-color').value = b.color;
+        document.getElementById('b-tipo').value = b.tipo;
+        document.getElementById('b-serial').value = b.serial;
+      } else {
+        document.getElementById('modal-title').textContent = 'Registrar Bicicleta';
+        ['b-marca','b-modelo','b-color','b-serial'].forEach(id=>document.getElementById(id).value='');
+      }
+      document.getElementById('bike-modal').classList.add('open');
+    }
+    function closeModal() { document.getElementById('bike-modal').classList.remove('open'); editingId=null; }
+
+    function saveBike() {
+      const b = {
+        id: editingId || Date.now().toString(),
+        marca: document.getElementById('b-marca').value,
+        modelo: document.getElementById('b-modelo').value,
+        color: document.getElementById('b-color').value,
+        tipo: document.getElementById('b-tipo').value,
+        serial: document.getElementById('b-serial').value,
+      };
+      if (!b.marca) { alert('La marca es obligatoria'); return; }
+      if (editingId) bikes = bikes.map(x=>x.id===editingId?b:x);
+      else bikes.push(b);
+      localStorage.setItem('bikes', JSON.stringify(bikes));
+      closeModal(); render();
+    }
+
+    function editBike(id) { openModal(id); }
+    function deleteBike(id) { if(confirm('¿Eliminar esta bicicleta?')) { bikes=bikes.filter(b=>b.id!==id); localStorage.setItem('bikes',JSON.stringify(bikes)); render(); } }
+
+    function openIncident() { document.getElementById('incident-modal').classList.add('open'); }
+    function closeIncident() { document.getElementById('incident-modal').classList.remove('open'); }
+    function submitIncident() {
+      const desc = document.getElementById('i-desc').value;
+      if (!desc) { alert('Por favor describe el incidente'); return; }
+      const incidents = JSON.parse(localStorage.getItem('userIncidents')||'[]');
+      incidents.push({ type: document.getElementById('i-type').value, description: desc, timestamp: new Date().toISOString(), status:'pendiente' });
+      localStorage.setItem('userIncidents', JSON.stringify(incidents));
+      alert('✅ Incidente reportado. Un guardia lo revisará pronto.');
+      closeIncident();
+      document.getElementById('i-desc').value = '';
+    }
+
+    render();
+  </script>
+</body>
+</html>
