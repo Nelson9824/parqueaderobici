@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QRide - Alertas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body{font-family:system-ui,sans-serif;background:#f8fafc;margin:0;}.card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);padding:16px;margin-bottom:12px;}.nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:#6b7a85;text-decoration:none;gap:2px;}.nav-item.active{color:#FF7A00;}</style>
+</head>
+<body>
+  <nav style="background:#fff;border-bottom:3px solid #FF7A00;position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:56px;">
+    <div style="display:flex;align-items:center;gap:8px;"><img src="image-1.png" alt="QRide" style="height:38px;object-fit:contain;" /><span style="font-size:12px;color:#6b7a85;">Guardia</span></div>
+    <button onclick="logout()" class="text-sm text-orange-500 font-semibold flex items-center gap-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/></svg>
+        Salir
+      </button>
+  </nav>
+
+  <main style="padding:16px;padding-bottom:80px;max-width:600px;margin:0 auto;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+      <div><h1 style="font-size:22px;font-weight:700;color:#044C71;margin-bottom:4px;">Alertas</h1><p style="font-size:13px;color:#6b7a85;">Notificaciones del sistema</p></div>
+      <span id="badge" style="background:#dc2626;color:#fff;border-radius:9999px;padding:4px 10px;font-size:13px;font-weight:700;"></span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div class="card" style="text-align:center;"><p style="font-size:11px;color:#6b7a85;">Activas</p><p id="active-count" style="font-size:24px;font-weight:700;color:#dc2626;">0</p></div>
+      <div class="card" style="text-align:center;"><p style="font-size:11px;color:#6b7a85;">Resueltas</p><p id="resolved-count" style="font-size:24px;font-weight:700;color:#16a34a;">0</p></div>
+    </div>
+    <div id="active-section"></div>
+    <div id="resolved-section"></div>
+  </main>
+
+<nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-2xl z-50">
+  <div class="grid grid-cols-3 h-16">
+    <a href="guardia-scanner.html" class="flex flex-col items-center justify-center text-gray-400">
+      <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2M7 12h10"/></svg>
+      <span class="text-xs font-medium">Scanner</span>
+    </a>
+    <a href="guardia-alertas.html" class="flex flex-col items-center justify-center" style="color:#FF7A00">
+      <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+      <span class="text-xs font-semibold">Alertas</span>
+    </a>
+    <a href="guardia-incidentes.html" class="flex flex-col items-center justify-center text-gray-400">
+      <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      <span class="text-xs font-medium">Incidentes</span>
+    </a>
+  </div>
+</nav>
+
+  <script>
+    if (!localStorage.getItem('isLoggedIn')) window.location = 'index.html';
+    function logout() { localStorage.removeItem('isLoggedIn'); window.location = 'index.html'; }
+
+    let alerts = [
+      {id:'1',type:'warning',message:'Intento de acceso con QR inválido',user:'Usuario Desconocido',timestamp:new Date().toISOString(),resolved:false},
+      {id:'2',type:'danger',message:'Bicicleta reportada como robada detectada',user:'María González',timestamp:new Date(Date.now()-3600000).toISOString(),resolved:false},
+      {id:'3',type:'info',message:'Múltiples intentos de salida sin entrada',user:'Carlos Rodríguez',timestamp:new Date(Date.now()-7200000).toISOString(),resolved:true},
+    ];
+
+    function timeAgo(iso) {
+      const diff = Date.now()-new Date(iso).getTime();
+      const m = Math.floor(diff/60000), h = Math.floor(m/60);
+      return h>0?`Hace ${h}h`:m>0?`Hace ${m}min`:'Ahora';
+    }
+    const colors = {danger:'border-red-500 bg-red-50',warning:'border-orange-500 bg-orange-50',info:'border-blue-500 bg-blue-50'};
+    const icons = {danger:'❌',warning:'⚠️',info:'🕐'};
+
+    function resolve(id) { alerts=alerts.map(a=>a.id===id?{...a,resolved:true}:a); render(); }
+
+    function render() {
+      const active=alerts.filter(a=>!a.resolved), resolved=alerts.filter(a=>a.resolved);
+      document.getElementById('active-count').textContent=active.length;
+      document.getElementById('resolved-count').textContent=resolved.length;
+      document.getElementById('badge').textContent=active.length||'';
+      document.getElementById('badge').style.display=active.length?'inline':'none';
+
+      document.getElementById('active-section').innerHTML = active.length ? `
+        <div class="card"><h2 style="font-size:15px;font-weight:600;color:#044C71;margin-bottom:12px;">⚠️ Alertas Activas</h2>
+        ${active.map(a=>`<div style="padding:12px;border-radius:8px;border-left:4px solid ${a.type==='danger'?'#ef4444':a.type==='warning'?'#f97316':'#3b82f6'};background:${a.type==='danger'?'#fef2f2':a.type==='warning'?'#fff7ed':'#eff6ff'};margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+            <div style="display:flex;gap:8px;flex:1;"><span style="font-size:18px;">${icons[a.type]}</span><div><p style="font-size:13px;font-weight:600;">${a.message}</p><p style="font-size:11px;color:#6b7a85;">Usuario: ${a.user}</p></div></div>
+            <span style="font-size:11px;color:#6b7a85;flex-shrink:0;margin-left:8px;">${timeAgo(a.timestamp)}</span>
+          </div>
+          <button onclick="resolve('${a.id}')" style="background:#044C71;color:#fff;border:none;border-radius:6px;height:32px;width:100%;font-size:12px;cursor:pointer;font-weight:600;">✅ Marcar como Resuelta</button>
+        </div>`).join('')}</div>` : '';
+
+      document.getElementById('resolved-section').innerHTML = resolved.length ? `
+        <div class="card"><h2 style="font-size:15px;font-weight:600;color:#044C71;margin-bottom:12px;">✅ Alertas Resueltas</h2>
+        ${resolved.map(a=>`<div style="padding:12px;border-radius:8px;background:#f8fafc;margin-bottom:8px;opacity:0.75;">
+          <div style="display:flex;justify-content:space-between;"><div style="display:flex;gap:8px;flex:1;"><span style="font-size:16px;">✅</span><div><p style="font-size:13px;font-weight:500;text-decoration:line-through;">${a.message}</p><p style="font-size:11px;color:#6b7a85;">Usuario: ${a.user}</p></div></div><span style="font-size:11px;color:#6b7a85;">${timeAgo(a.timestamp)}</span></div>
+        </div>`).join('')}</div>` : '';
+    }
+    render();
+  </script>
+</body>
+</html>

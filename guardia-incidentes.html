@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QRide - Incidentes Guardia</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body{font-family:system-ui,sans-serif;background:#f8fafc;margin:0;}.card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);padding:16px;margin-bottom:12px;}.input-f{background:#F1F5F9;border:none;border-radius:8px;height:44px;width:100%;padding:0 12px;font-size:14px;color:#044C71;outline:none;box-sizing:border-box;}.nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:#6b7a85;text-decoration:none;gap:2px;}.nav-item.active{color:#FF7A00;}.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:center;justify-content:center;}.modal-bg.open{display:flex;}.modal{background:#fff;border-radius:16px;padding:24px;width:90%;max-width:420px;max-height:90vh;overflow-y:auto;}label{font-size:13px;font-weight:600;color:#044C71;display:block;margin-bottom:4px;}</style>
+</head>
+<body>
+  <nav style="background:#fff;border-bottom:3px solid #FF7A00;position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:56px;">
+    <div style="display:flex;align-items:center;gap:8px;"><img src="image-1.png" alt="QRide" style="height:38px;object-fit:contain;" /><span style="font-size:12px;color:#6b7a85;">Guardia</span></div>
+    <button onclick="logout()" class="text-sm text-orange-500 font-semibold flex items-center gap-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/></svg>
+        Salir
+      </button>
+  </nav>
+
+  <main style="padding:16px;padding-bottom:80px;max-width:600px;margin:0 auto;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+      <div><h1 style="font-size:22px;font-weight:700;color:#044C71;margin-bottom:4px;">Incidentes</h1><p style="font-size:13px;color:#6b7a85;">Registro de incidentes</p></div>
+      <button onclick="openModal()" style="background:#FF7A00;color:#fff;border:none;border-radius:8px;height:40px;padding:0 16px;font-size:14px;font-weight:600;cursor:pointer;">+ Nuevo</button>
+    </div>
+    <div class="card"><div id="incidents-list"></div></div>
+  </main>
+
+  <div class="modal-bg" id="modal">
+    <div class="modal">
+      <h2 style="font-size:16px;font-weight:700;color:#044C71;margin-bottom:16px;">Registrar Incidente</h2>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div><label>Tipo de Incidente</label>
+          <select class="input-f" id="i-type">
+            <option value="sospecha">Actividad Sospechosa</option><option value="dano">Daño a Propiedad</option>
+            <option value="robo">Intento de Robo</option><option value="acceso">Acceso No Autorizado</option><option value="otro">Otro</option>
+          </select>
+        </div>
+        <div><label>Usuario Involucrado (Opcional)</label><input class="input-f" id="i-user" placeholder="Nombre del usuario" /></div>
+        <div><label>Prioridad</label>
+          <select class="input-f" id="i-priority"><option value="baja">Baja</option><option value="media" selected>Media</option><option value="alta">Alta</option></select>
+        </div>
+        <div><label>Descripción</label><textarea id="i-desc" style="background:#F1F5F9;border:none;border-radius:8px;width:100%;padding:12px;font-size:14px;color:#044C71;outline:none;min-height:100px;box-sizing:border-box;resize:none;" placeholder="Describe detalladamente lo ocurrido..."></textarea></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px;">
+        <button onclick="closeModal()" style="flex:1;height:44px;border:1.5px solid #e5e7eb;border-radius:8px;background:#fff;cursor:pointer;">Cancelar</button>
+        <button onclick="saveIncident()" style="flex:1;height:44px;background:#FF7A00;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;">Registrar</button>
+      </div>
+    </div>
+  </div>
+
+<nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-2xl z-50">
+  <div class="grid grid-cols-3 h-16">
+    <a href="guardia-scanner.html" class="flex flex-col items-center justify-center text-gray-400">
+      <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2M7 12h10"/></svg>
+      <span class="text-xs font-medium">Scanner</span>
+    </a>
+    <a href="guardia-alertas.html" class="flex flex-col items-center justify-center text-gray-400">
+      <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+      <span class="text-xs font-medium">Alertas</span>
+    </a>
+    <a href="guardia-incidentes.html" class="flex flex-col items-center justify-center" style="color:#FF7A00">
+      <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      <span class="text-xs font-semibold">Incidentes</span>
+    </a>
+  </div>
+</nav>
+
+  <script>
+    if (!localStorage.getItem('isLoggedIn')) window.location = 'index.html';
+    function logout() { localStorage.removeItem('isLoggedIn'); window.location = 'index.html'; }
+
+    let incidents = JSON.parse(localStorage.getItem('guardIncidents')||'[]');
+    const tipos = {sospecha:'Actividad Sospechosa',dano:'Daño a Propiedad',robo:'Intento de Robo',acceso:'Acceso No Autorizado',otro:'Otro'};
+    const pColors = {alta:'background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;',media:'background:#ffedd5;color:#c2410c;border:1px solid #fdba74;',baja:'background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd;'};
+
+    function openModal() { document.getElementById('modal').classList.add('open'); }
+    function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+    function saveIncident() {
+      const desc = document.getElementById('i-desc').value;
+      if (!desc) { alert('Por favor describe el incidente'); return; }
+      incidents = [{id:Date.now().toString(),type:document.getElementById('i-type').value,user:document.getElementById('i-user').value,priority:document.getElementById('i-priority').value,description:desc,timestamp:new Date().toISOString()},...incidents];
+      localStorage.setItem('guardIncidents',JSON.stringify(incidents));
+      closeModal(); render();
+      document.getElementById('i-desc').value=''; document.getElementById('i-user').value='';
+    }
+
+    function render() {
+      const el = document.getElementById('incidents-list');
+      if (!incidents.length) { el.innerHTML='<div style="text-align:center;padding:40px 0;"><p style="font-size:32px;">📋</p><p style="font-size:15px;font-weight:600;margin-top:8px;">Sin incidentes</p><p style="font-size:13px;color:#6b7a85;">No hay incidentes registrados</p></div>'; return; }
+      el.innerHTML = incidents.map(i=>`
+        <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+            <div style="display:flex;gap:8px;flex:1;">
+              <span style="font-size:18px;">⚠️</span>
+              <div><p style="font-size:13px;font-weight:600;">${tipos[i.type]||i.type}</p>${i.user?`<p style="font-size:11px;color:#6b7a85;">Usuario: ${i.user}</p>`:''}</div>
+            </div>
+            <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;flex-shrink:0;${pColors[i.priority]}">${i.priority.toUpperCase()}</span>
+          </div>
+          <p style="font-size:12px;color:#6b7a85;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${i.description}</p>
+          <p style="font-size:11px;color:#9ca3af;">${new Date(i.timestamp).toLocaleString('es-CO',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</p>
+        </div>`).join('');
+    }
+    render();
+  </script>
+</body>
+</html>

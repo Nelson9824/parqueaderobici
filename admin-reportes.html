@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin – Reportes | QRide</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <nav class="bg-white shadow-md sticky top-0 z-50" style="border-bottom:3px solid #FF7A00">
+    <div class="px-4 flex items-center justify-between h-14">
+      <div class="flex items-center gap-2">
+        <img src="image-1.png" alt="QRide" style="height:38px;object-fit:contain">
+        <span class="text-gray-500 text-xs">Admin</span>
+      </div>
+      <button onclick="logout()" class="text-sm text-orange-500 font-semibold flex items-center gap-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/></svg>
+        Salir
+      </button>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <main class="flex-1 pb-20 px-4 pt-4 max-w-2xl mx-auto w-full">
+    <h1 class="text-xl font-bold mb-1" style="color:#044C71">Reportes del Sistema</h1>
+    <p class="text-gray-500 text-sm mb-4">Genera y consulta reportes</p>
+
+    <!-- Generate report -->
+    <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
+      <h2 class="font-semibold mb-3" style="color:#044C71">Generar Nuevo Reporte</h2>
+      <div id="reportTypes" class="grid grid-cols-2 gap-3 mb-4"></div>
+      <div class="mb-3">
+        <label class="text-sm text-gray-600 block mb-1">Período</label>
+        <select class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50">
+          <option>Última semana</option>
+          <option>Último mes</option>
+          <option>Último trimestre</option>
+          <option>Último año</option>
+        </select>
+      </div>
+      <button onclick="generateReport()" class="w-full text-white rounded-lg py-2.5 text-sm font-semibold" style="background:#FF7A00">
+        Generar Reporte
+      </button>
+    </div>
+
+    <!-- Recent reports -->
+    <div class="bg-white rounded-xl shadow-sm p-4">
+      <h2 class="font-semibold mb-3" style="color:#044C71">Reportes Recientes</h2>
+      <div id="recentReports"></div>
+    </div>
+  </main>
+
+  <!-- Bottom Nav -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-2xl z-50">
+    <div class="grid grid-cols-4 h-16">
+      <a href="admin-dashboard.html" class="flex flex-col items-center justify-center text-gray-400">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1" stroke-width="2"/></svg>
+        <span class="text-xs font-medium">Dashboard</span>
+      </a>
+      <a href="admin-usuarios.html" class="flex flex-col items-center justify-center text-gray-400">
+<svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <circle cx="9" cy="7" r="3" stroke-width="2"/>
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-1a6 6 0 016-6h0a6 6 0 016 6v1"/>
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 3.13a4 4 0 010 7.75"/>
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21v-1a4 4 0 00-3-3.85"/>
+</svg>
+        <span class="text-xs font-medium">Usuarios</span>
+      </a>
+      <a href="admin-reportes.html" class="flex flex-col items-center justify-center" style="color:#FF7A00">
+        <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <span class="text-xs font-semibold">Reportes</span>
+      </a>
+      <a href="admin-configuracion.html" class="flex flex-col items-center justify-center text-gray-400">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3" stroke-width="2"/></svg>
+        <span class="text-xs font-medium">Config</span>
+      </a>
+    </div>
+  </nav>
+
+  <script>
+    (function() {
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      const userRole = localStorage.getItem('userRole');
+      if (!isLoggedIn || userRole !== 'admin') { window.location.href = 'index.html'; return; }
+    })();
+
+    function logout() {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userRole');
+      window.location.href = 'index.html';
+    }
+
+    const reportTypes = [
+      ['📊', 'Accesos', 'Entradas y salidas registradas'],
+      ['👥', 'Usuarios', 'Actividad por usuario'],
+      ['🚲', 'Bicicletas', 'Registro de bicicletas'],
+      ['⚠️', 'Incidentes', 'Incidentes reportados'],
+    ];
+
+    let selectedType = 0;
+
+    function renderReportTypes() {
+      document.getElementById('reportTypes').innerHTML = reportTypes.map(([icon, title, desc], i) =>
+        '<button onclick="selectType(' + i + ')" class="border-2 rounded-xl p-3 text-left transition-all" style="' +
+          (selectedType === i ? 'border-color:#FF7A00;background:#FFF5EB' : 'border-color:#e5e7eb;background:#fff') + '">' +
+          '<span class="text-xl block mb-1">' + icon + '</span>' +
+          '<p class="text-sm font-semibold" style="color:#044C71">' + title + '</p>' +
+          '<p class="text-xs text-gray-400">' + desc + '</p>' +
+        '</button>'
+      ).join('');
+    }
+
+    function selectType(i) {
+      selectedType = i;
+      renderReportTypes();
+    }
+
+    function generateReport() {
+      const names = ['Accesos', 'Usuarios', 'Bicicletas', 'Incidentes'];
+      const now = new Date().toLocaleDateString('es-CO');
+      alert('Reporte de ' + names[selectedType] + ' generado para ' + now);
+    }
+
+    const recentReports = [
+      ['Reporte de Accesos – Mayo 2026', '01/06/2026', '2.4 KB'],
+      ['Reporte de Usuarios – Mayo 2026', '01/06/2026', '1.8 KB'],
+      ['Reporte de Incidentes – Abril 2026', '02/05/2026', '0.9 KB'],
+      ['Reporte Mensual General – Abril 2026', '02/05/2026', '4.1 KB'],
+    ];
+
+    document.getElementById('recentReports').innerHTML = recentReports.map(([name, date, size]) =>
+      '<div class="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">' +
+        '<div>' +
+          '<p class="text-sm font-medium text-gray-800">' + name + '</p>' +
+          '<p class="text-xs text-gray-400">' + date + ' · ' + size + '</p>' +
+        '</div>' +
+        '<button class="text-xs font-semibold px-3 py-1.5 rounded-lg border" style="color:#0376B2;border-color:#0376B2">Descargar</button>' +
+      '</div>'
+    ).join('');
+
+    renderReportTypes();
+  </script>
+</body>
+</html>
